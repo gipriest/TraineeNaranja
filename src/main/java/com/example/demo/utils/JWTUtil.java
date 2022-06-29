@@ -33,13 +33,13 @@ public class JWTUtil {
     private String issuer;
 
     @Value("${security.jwt.ttlMillis}")
-    private long ttlMillis;
+    private Long ttlMillis;
 
 
     private final Logger log = LoggerFactory
             .getLogger(JWTUtil.class);
 
-    public JWTUtil(String key, String issuer, long ttlMillis){
+    public JWTUtil(String key, String issuer, Long ttlMillis){
         this.key = key;
         this.issuer = issuer;
         this.ttlMillis = ttlMillis;
@@ -66,7 +66,6 @@ public class JWTUtil {
                 .builder()
                 .setId(id)
                 .setSubject(subject)
-
                 .claim("authorities",
                         grantedAuthorities.stream()
                                 .map(GrantedAuthority::getAuthority)
@@ -76,7 +75,7 @@ public class JWTUtil {
                 .signWith(SignatureAlgorithm.HS512,
                         key.getBytes()).compact();
 
-        return "Bearer " + token;
+        return "Bearer "+token;
     }
 
     /**
@@ -88,9 +87,6 @@ public class JWTUtil {
     public String getRole(String jwt) {
         // This line will throw an exception if it is not a signed JWS (as
         // expected)
-
-        String[] newStr = jwt.split("\\s+");
-        jwt = newStr[1];
         Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(key))
                 .parseClaimsJws(jwt).getBody();
 
@@ -125,5 +121,35 @@ public class JWTUtil {
                 .parseClaimsJws(jwt).getBody();
 
         return claims.getSubject();
+    }
+
+    /**
+     * Method to validate and read the JWT
+     *
+     * @param jwt
+     * @return
+     */
+    public Long getTimeInit(String jwt) {
+        // This line will throw an exception if it is not a signed JWS (as
+        // expected)
+        Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(key))
+                .parseClaimsJws(jwt).getBody();
+
+        return claims.getIssuedAt().getTime();
+    }
+
+    /**
+     * Method to validate and read the JWT
+     *
+     * @param jwt
+     * @return
+     */
+    public Date getExpiration(String jwt) {
+        // This line will throw an exception if it is not a signed JWS (as
+        // expected)
+        Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(key))
+                .parseClaimsJws(jwt).getBody();
+
+        return claims.getExpiration();
     }
 }

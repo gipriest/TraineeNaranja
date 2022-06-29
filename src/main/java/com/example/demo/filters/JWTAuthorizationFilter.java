@@ -1,6 +1,7 @@
 package com.example.demo.filters;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
     private static final String HEADER = "Authorization";
     private static final String PREFIX = "Bearer ";
-    private static final String SECRET = "palabrasecreta";
+    private static final String SECRET ="palabrasecreta";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

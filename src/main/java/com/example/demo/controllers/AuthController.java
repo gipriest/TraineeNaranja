@@ -32,25 +32,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDto loginDto) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDto loginDto) {
         log.info("Peticion del usuario: "+ loginDto.username + " para el login");
         Long id;
         String role = "";
 
         try {
-            Optional<UsersEntity> usersEntity = login.getUserByCredentials(loginDto.username, loginDto.password);
+            Optional<UsersEntity> usersEntity = login.getUserByCredentials(loginDto);
             id = usersEntity.get().getIdUsuario();
             role = usersEntity.get().getIdRole().getName();
-            String tokenJwt = jwtutil.create(String.valueOf(id), loginDto.username, role);
 
-            return new ResponseEntity<>(tokenJwt, HttpStatus.OK);
+            return new ResponseEntity<>(login.login(loginDto, id, role), HttpStatus.OK);
 
-        } catch (UserNotFoundException u) {
-            log.error("Usuario no encontrado");
-            return new ResponseEntity<>(u.getMessage(), HttpStatus.NOT_FOUND);
-
-        }catch (WrongPasswordException u) {
-            log.error("Contraseña incorrecta");
+        }catch (TokenException u) {
+            log.error("Token Exception - Create");
             return new ResponseEntity<>(u.getMessage(), HttpStatus.BAD_REQUEST);
 
         } catch (RepositoryException e) {

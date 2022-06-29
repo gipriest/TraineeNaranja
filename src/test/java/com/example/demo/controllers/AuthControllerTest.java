@@ -50,7 +50,7 @@ class AuthControllerTest {
 
         util = new JWTUtil(key, issuer, ttlMillis);
         repository = mock(UserRepository.class);
-        service = new LoginService(repository);
+        service = new LoginService(repository, util);
         controller = new AuthController(service, util);
 
         loginDto = new UserLoginDto();
@@ -70,7 +70,7 @@ class AuthControllerTest {
         ResponseEntity<String> response;
 
         if(violations.isEmpty()){
-            response = controller.login(loginDto);
+            response = (ResponseEntity<String>) controller.login(loginDto);
         }else {
             response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -91,7 +91,7 @@ class AuthControllerTest {
         ResponseEntity<String> response;
 
         if(violations.isEmpty()){
-            response = controller.login(loginDto);
+            response = (ResponseEntity<String>) controller.login(loginDto);
         }else {
             response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -109,7 +109,7 @@ class AuthControllerTest {
 
         when(repository.getUser("encontrado")).thenReturn(Optional.of(entity));
 
-        ResponseEntity<String> response = controller.login(loginDto);
+        ResponseEntity<String> response = (ResponseEntity<String>) controller.login(loginDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -119,7 +119,7 @@ class AuthControllerTest {
         loginDto.username = "no_encontrado";
 
         when(repository.getUser("no_encontrado")).thenThrow(new UserNotFoundException());
-        ResponseEntity<String> response = controller.login(loginDto);
+        ResponseEntity<String> response = (ResponseEntity<String>) controller.login(loginDto);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -132,7 +132,7 @@ class AuthControllerTest {
         loginDto.password = "456789";
 
         when(repository.getUser("encontrado")).thenReturn(Optional.of(entity));
-        ResponseEntity<String> response = controller.login(loginDto);
+        ResponseEntity<String> response = (ResponseEntity<String>) controller.login(loginDto);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -142,7 +142,7 @@ class AuthControllerTest {
         loginDto.username = "exception";
 
         when(repository.getUser("exception")).thenThrow(new RuntimeException());
-        ResponseEntity<String> response = controller.login(loginDto);
+        ResponseEntity<String> response = (ResponseEntity<String>) controller.login(loginDto);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }

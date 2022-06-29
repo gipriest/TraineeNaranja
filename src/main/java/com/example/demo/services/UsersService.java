@@ -31,7 +31,6 @@ public class UsersService {
         this.context = context;
     }
 
-
     public void register(UserCreateDto dto) {
         log.debug("Users Service: register a new user");
         try{
